@@ -198,7 +198,6 @@
 // (broadcast radio) and about 3.5 for NBFM (walkie-talkie style radio)
 #define DEVIATION        25.0
 
-
 typedef struct {
     uint32_t info, src, dst, length,
          stride, next, pad[2];
@@ -318,7 +317,7 @@ map_peripheral(uint32_t base, uint32_t len)
 #define DATA_SIZE 5000
 
 
-int tx(uint32_t carrier_freq, char *audio_file, uint16_t pi, char *ps, char *rt, float ppm, char *control_pipe) {
+int tx(uint32_t carrier_freq, char *audio_file, uint16_t pi, char *ps, char *rt, float ppm, char *control_pipe, float preemphasis_cutoff) {
     // Catch all signals possible - it is vital we kill the DMA engine
     // on process exit!
     for (int i = 0; i < 64; i++) {
@@ -453,8 +452,13 @@ int tx(uint32_t carrier_freq, char *audio_file, uint16_t pi, char *ps, char *rt,
     int data_index = 0;
 
     // Initialize the baseband generator
+<<<<<<< HEAD
     if(fm_mpx_open(audio_file, DATA_SIZE) < 0) return 1;
 
+=======
+    if(fm_mpx_open(audio_file, DATA_SIZE, preemphasis_cutoff) < 0) return 1;
+    
+>>>>>>> d81db0e (preemphasis is now configurable from CLI)
     // Initialize the RDS modulator
     char myps[9] = {0};
     set_rds_pi(pi);
@@ -546,6 +550,8 @@ int tx(uint32_t carrier_freq, char *audio_file, uint16_t pi, char *ps, char *rt,
     return 0;
 }
 
+#define PREEMPHASIS_EU 3185
+#define PREEMPHASIS_US 2120
 
 int main(int argc, char **argv) {
     char *audio_file = NULL;
@@ -555,8 +561,14 @@ int main(int argc, char **argv) {
     char *rt = "PiFmRds: live FM-RDS transmission from the RaspberryPi";
     uint16_t pi = 0x1234;
     float ppm = 0;
+<<<<<<< HEAD
 
 
+=======
+	float preemphasis_cutoff = PREEMPHASIS_US;
+    
+    
+>>>>>>> d81db0e (preemphasis is now configurable from CLI)
     // Parse command-line arguments
     for(int i=1; i<argc; i++) {
         char *arg = argv[i];
@@ -587,6 +599,16 @@ int main(int argc, char **argv) {
         } else if(strcmp("-ctl", arg)==0 && param != NULL) {
             i++;
             control_pipe = param;
+		} else if(strcmp("-preemph", arg)==0 && param != NULL) {
+			i++;
+			if(strcmp("eu", param)==0) {
+				preemphasis_cutoff = PREEMPHASIS_EU;
+			} else if(strcmp("us", param)==0) {
+				preemphasis_cutoff = PREEMPHASIS_US;
+			}
+			else {
+				preemphasis_cutoff = atof(param);
+			}
         } else {
             fatal("Unrecognised argument: %s.\n"
             "Syntax: pi_fm_rds [-freq freq] [-audio file] [-ppm ppm_error] [-pi pi_code]\n"
@@ -598,8 +620,8 @@ int main(int argc, char **argv) {
     // non-ASCII characters using mbtowc() in rds_strings.c.
     char* locale = setlocale(LC_ALL, "");
     printf("Locale set to %s.\n", locale);
-
-    int errcode = tx(carrier_freq, audio_file, pi, ps, rt, ppm, control_pipe);
-
+    
+    int errcode = tx(carrier_freq, audio_file, pi, ps, rt, ppm, control_pipe, preemphasis_cutoff);
+    
     terminate(errcode);
 }
