@@ -624,6 +624,11 @@ int main(int argc, char **argv) {
     char* locale = setlocale(LC_ALL, "");
     printf("Locale set to %s.\n", locale);
     
+    // Set locale based on the environment variables. This is necessary to decode
+    // non-ASCII characters using mbtowc() in rds_strings.c.
+    char* locale = setlocale(LC_ALL, "");
+    printf("Locale set to %s.\n", locale);
+
     int errcode = tx(carrier_freq, audio_file, pi, ps, rt, ppm, control_pipe, cutoff, preemphasis_cutoff);
     
     terminate(errcode);
