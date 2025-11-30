@@ -238,4 +238,8 @@ The samples are played by `pi_fm_rds.c` that is adapted from Richard Hirst's [Pi
 
 --------
 
+<<<<<<< HEAD
 © [Christophe Jacquet](https://jacquet.xyz/en/), 2014-2026. Released under the GNU GPL v3.
+=======
+© [Christophe Jacquet](https://jacquet.xyz/en/) (F8FTK), 2014-2025. Released under the GNU GPL v3.
+>>>>>>> cd6d744 (Fixes to README. Mention using different float-abi values on different distributions.)
